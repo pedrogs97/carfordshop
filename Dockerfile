@@ -1,31 +1,21 @@
-FROM python:3.9-alpine3.13
+FROM python:3.9-slim
 
 ENV PYTHONUNBUFFERED 1
 
-COPY . /app
-COPY Pipfile /app/Pipfile
-COPY Pipfile.lock /app/Pipfile.lock
+COPY ./app /app
+COPY ./app/Pipfile /app/Pipfile
 WORKDIR /app
 EXPOSE 8000
 
-RUN /py/bin/pip install --upgrade pip && \
-    pip install pipenv && pipenv install && \
-    apk add --update --no-cache postgresql-client jpeg-dev && \
-    apk add --update --no-cache --virtual .tmp-build-deps \
-        build-base postgresql-dev musl-dev zlib zlib-dev linux-headers && \
-    apk del .tmp-build-deps && \
+RUN python -m pip install --upgrade pip && \
+    # apt-get install build-dep python-psycopg2 && \
+    pip install pipenv && pipenv install --dev --system --deploy && \
     adduser \
-        --disabled-password \
-        --no-create-home \
-        django-user && \
+    --disabled-password \
+    --no-create-home \
+    django-user && \
     mkdir -p /vol/web/media && \
-    mkdir -p /vol/web/static && \
     chown -R django-user:django-user /vol && \
-    chmod -R 755 /vol && \
-    chmod -R +x /scripts
-
-ENV PATH="/scripts:/py/bin:$PATH"
+    chmod -R 755 /vol
 
 USER django-user
-
-CMD ["python", "main.py"]
