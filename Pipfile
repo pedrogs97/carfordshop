@@ -5,10 +5,11 @@ name = "pypi"
 
 [packages]
 django = "*"
-black = "*"
 djangorestframework = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
+black = "*"
 
 [requires]
 python_version = "3.9"
